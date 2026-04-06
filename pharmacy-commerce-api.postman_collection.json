@@ -1,0 +1,1184 @@
+{
+  "info": {
+    "name": "Pharmacy Commerce API",
+    "description": "E-commerce da farmácia — v6 (COMPLETA): Auth, Home, Banners, Categorias, Marcas, Produtos, Preços, Estoque, Clientes, Carrinho, Pedidos, Busca, Auditoria.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "pharmacy-commerce-api-v6"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', body.data.token);",
+                  "    pm.test('Login realizado com sucesso', () => pm.expect(body.success).to.be.true);",
+                  "    pm.test('Token salvo na variável authToken', () => pm.expect(body.data.token).to.be.a('string'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@farmacia.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Autentica o administrador e salva automaticamente o token JWT na variável `authToken`."
+          }
+        },
+        {
+          "name": "Login (Cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', body.data.token);",
+                  "    pm.test('Login realizado com sucesso', () => pm.expect(body.success).to.be.true);",
+                  "    pm.test('Token salvo na variável authToken', () => pm.expect(body.data.token).to.be.a('string'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente@email.com\",\n  \"password\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/customer/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "customer", "login"]
+            },
+            "description": "Autentica o cliente e salva automaticamente o token JWT na variável `authToken`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Clientes",
+      "item": [
+        {
+          "name": "Registrar cliente",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João da Silva\",\n  \"email\": \"cliente@email.com\",\n  \"password\": \"senha123\",\n  \"cpf\": \"123.456.789-09\",\n  \"phone\": \"(11) 99999-9999\",\n  \"birthDate\": \"1990-05-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/customers/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "customers", "register"]
+            }
+          }
+        },
+        {
+          "name": "Ver perfil",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João da Silva Junior\",\n  \"phone\": \"(11) 98888-7777\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me"]
+            }
+          }
+        },
+        {
+          "name": "Listar endereços",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me/addresses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me", "addresses"]
+            }
+          }
+        },
+        {
+          "name": "Adicionar endereço",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Casa\",\n  \"recipientName\": \"João da Silva\",\n  \"street\": \"Rua das Flores\",\n  \"number\": \"123\",\n  \"complement\": \"Apto 45\",\n  \"neighborhood\": \"Centro\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"01310-100\",\n  \"isDefault\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me/addresses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me", "addresses"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar endereço",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Casa\",\n  \"recipientName\": \"João da Silva\",\n  \"street\": \"Rua das Flores\",\n  \"number\": \"456\",\n  \"complement\": null,\n  \"neighborhood\": \"Centro\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"01310-100\",\n  \"isDefault\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me/addresses/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me", "addresses", "1"]
+            }
+          }
+        },
+        {
+          "name": "Definir endereço como padrão",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me/addresses/1/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me", "addresses", "1", "default"]
+            }
+          }
+        },
+        {
+          "name": "Remover endereço",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me/addresses/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "me", "addresses", "1"]
+            }
+          }
+        },
+        {
+          "name": "Admin — Listar clientes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/customers?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "customers"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "search", "value": "joao", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin — Buscar cliente por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/customers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "customers", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Carrinho",
+      "item": [
+        {
+          "name": "Ver carrinho",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart"]
+            }
+          }
+        },
+        {
+          "name": "Adicionar item",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart", "items"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar quantidade do item",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart", "items", "1"]
+            },
+            "description": "Informe quantity=0 para remover o item."
+          }
+        },
+        {
+          "name": "Remover item",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart", "items", "1"]
+            }
+          }
+        },
+        {
+          "name": "Limpar carrinho",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Busca",
+      "item": [
+        {
+          "name": "Busca global",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/search?q=dipirona",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "search"],
+              "query": [
+                { "key": "q", "value": "dipirona" }
+              ]
+            },
+            "description": "Busca simultânea em produtos, categorias e marcas. Retorna até 10 resultados por tipo."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Auditoria (Admin)",
+      "item": [
+        {
+          "name": "Listar logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/audit?page=0&size=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "audit"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "50" },
+                { "key": "userEmail", "value": "admin@farmacia.com", "disabled": true },
+                { "key": "action", "value": "CREATE", "disabled": true },
+                { "key": "entityType", "value": "Product", "disabled": true }
+              ]
+            },
+            "description": "Filtros opcionais: userEmail, action (CREATE|UPDATE|DELETE|LOGIN|CHECKOUT), entityType."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏠 Home",
+      "item": [
+        {
+          "name": "Dados da home",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/home",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "home"]
+            },
+            "description": "Retorna banners ativos, categorias ativas e produtos em destaque."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🖼️ Banners (Admin)",
+      "item": [
+        {
+          "name": "Criar banner",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Promoção de Verão\",\n  \"subtitle\": \"Até 40% de desconto em protetor solar\",\n  \"imageUrl\": \"https://exemplo.com/banners/verao-desktop.jpg\",\n  \"mobileImageUrl\": \"https://exemplo.com/banners/verao-mobile.jpg\",\n  \"targetUrl\": \"/produtos?categoryId=1\",\n  \"position\": \"HOME_TOP\",\n  \"displayOrder\": 1,\n  \"startAt\": null,\n  \"endAt\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/banners",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "banners"]
+            },
+            "description": "position: HOME_TOP | HOME_MIDDLE | HOME_BOTTOM | SIDEBAR | POPUP"
+          }
+        },
+        {
+          "name": "Criar banner com agendamento",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Semana da Saúde\",\n  \"subtitle\": \"Vitaminas e suplementos com desconto\",\n  \"imageUrl\": \"https://exemplo.com/banners/saude-desktop.jpg\",\n  \"position\": \"HOME_TOP\",\n  \"displayOrder\": 2,\n  \"startAt\": \"2026-03-20T00:00:00\",\n  \"endAt\": \"2026-03-27T23:59:59\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/banners",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "banners"]
+            }
+          }
+        },
+        {
+          "name": "Listar todos os banners",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/banners",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "banners"]
+            }
+          }
+        },
+        {
+          "name": "Buscar banner por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/banners/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "banners", "1"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar banner",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Promoção de Verão — Edição Especial\",\n  \"displayOrder\": 0,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/banners/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "banners", "1"]
+            }
+          }
+        },
+        {
+          "name": "Desativar banner",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/banners/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "banners", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📂 Categorias",
+      "item": [
+        {
+          "name": "Public",
+          "item": [
+            {
+              "name": "Listar categorias ativas",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "categories"]
+                }
+              }
+            },
+            {
+              "name": "Buscar categoria por slug",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/categories/medicamentos",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "categories", "medicamentos"]
+                },
+                "description": "Substitua `medicamentos` pelo slug real da categoria."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Criar categoria",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Medicamentos\",\n  \"description\": \"Remédios e medicamentos em geral\",\n  \"imageUrl\": null,\n  \"displayOrder\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "categories"]
+                }
+              }
+            },
+            {
+              "name": "Criar subcategoria",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Analgésicos\",\n  \"parentId\": 1,\n  \"description\": \"Medicamentos para dor\",\n  \"displayOrder\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "categories"]
+                }
+              }
+            },
+            {
+              "name": "Listar categorias (paginado)",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/categories?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "categories"],
+                  "query": [
+                    { "key": "page", "value": "0" },
+                    { "key": "size", "value": "20" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Buscar categoria por ID",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/categories/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "categories", "1"]
+                }
+              }
+            },
+            {
+              "name": "Atualizar categoria",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Medicamentos e Remédios\",\n  \"description\": \"Descrição atualizada\",\n  \"displayOrder\": 1,\n  \"active\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/categories/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "categories", "1"]
+                }
+              }
+            },
+            {
+              "name": "Desativar categoria",
+              "request": {
+                "method": "DELETE",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/categories/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "categories", "1"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🏷️ Marcas",
+      "item": [
+        {
+          "name": "Public",
+          "item": [
+            {
+              "name": "Listar marcas ativas",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/brands",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "brands"]
+                }
+              }
+            },
+            {
+              "name": "Buscar marca por slug",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/brands/bayer",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "brands", "bayer"]
+                },
+                "description": "Substitua `bayer` pelo slug real da marca."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Criar marca",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Bayer\",\n  \"description\": \"Farmacêutica multinacional alemã\",\n  \"logoUrl\": null\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "brands"]
+                }
+              }
+            },
+            {
+              "name": "Listar marcas (paginado)",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "brands"],
+                  "query": [
+                    { "key": "page", "value": "0" },
+                    { "key": "size", "value": "20" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Buscar marca por ID",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "brands", "1"]
+                }
+              }
+            },
+            {
+              "name": "Atualizar marca",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Bayer S.A.\",\n  \"description\": \"Descrição atualizada\",\n  \"active\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "brands", "1"]
+                }
+              }
+            },
+            {
+              "name": "Desativar marca",
+              "request": {
+                "method": "DELETE",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "brands", "1"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "📦 Produtos",
+      "item": [
+        {
+          "name": "Public",
+          "item": [
+            {
+              "name": "Listar produtos ativos",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/products?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "products"],
+                  "query": [
+                    { "key": "page", "value": "0" },
+                    { "key": "size", "value": "20" },
+                    { "key": "featured", "value": "true", "disabled": true },
+                    { "key": "categoryId", "value": "1", "disabled": true },
+                    { "key": "brandId", "value": "1", "disabled": true },
+                    { "key": "search", "value": "dipirona", "disabled": true }
+                  ]
+                },
+                "description": "Desabilite/habilite os query params conforme necessário."
+              }
+            },
+            {
+              "name": "Buscar produto por slug",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/products/dipirona-500mg",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "products", "dipirona-500mg"]
+                },
+                "description": "Substitua `dipirona-500mg` pelo slug real do produto."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Criar produto (completo)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Dipirona Sódica 500mg\",\n  \"sku\": \"DIP-500-100CP\",\n  \"categoryId\": 1,\n  \"brandId\": 1,\n  \"shortDescription\": \"Analgésico e antitérmico em comprimidos\",\n  \"fullDescription\": \"Dipirona Sódica 500mg — caixa com 100 comprimidos. Indicado para dores leves a moderadas e febre.\",\n  \"featured\": true,\n  \"requiresPrescription\": false,\n  \"controlledItem\": false,\n  \"images\": [\n    {\n      \"imageUrl\": \"https://exemplo.com/imagens/dipirona-500mg-frente.jpg\",\n      \"altText\": \"Dipirona 500mg frente\",\n      \"displayOrder\": 0,\n      \"isPrimary\": true\n    },\n    {\n      \"imageUrl\": \"https://exemplo.com/imagens/dipirona-500mg-verso.jpg\",\n      \"altText\": \"Dipirona 500mg verso\",\n      \"displayOrder\": 1,\n      \"isPrimary\": false\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products"]
+                }
+              }
+            },
+            {
+              "name": "Criar produto (mínimo)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Paracetamol 750mg\",\n  \"sku\": \"PAR-750-20CP\",\n  \"shortDescription\": \"Analgésico e antitérmico\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products"]
+                }
+              }
+            },
+            {
+              "name": "Listar produtos admin (paginado)",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products?page=0&size=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products"],
+                  "query": [
+                    { "key": "page", "value": "0" },
+                    { "key": "size", "value": "20" },
+                    { "key": "active", "value": "true", "disabled": true },
+                    { "key": "featured", "value": "true", "disabled": true },
+                    { "key": "categoryId", "value": "1", "disabled": true },
+                    { "key": "brandId", "value": "1", "disabled": true },
+                    { "key": "search", "value": "dipirona", "disabled": true }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Buscar produto por ID",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products", "1"]
+                }
+              }
+            },
+            {
+              "name": "Atualizar produto",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Dipirona Sódica 500mg — Genérico\",\n  \"shortDescription\": \"Analgésico e antitérmico genérico\",\n  \"featured\": true,\n  \"active\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products", "1"]
+                }
+              }
+            },
+            {
+              "name": "Alternar ativo/inativo",
+              "request": {
+                "method": "PATCH",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products/1/active",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products", "1", "active"]
+                }
+              }
+            },
+            {
+              "name": "Desativar produto",
+              "request": {
+                "method": "DELETE",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/products/1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "admin", "products", "1"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🛍️ Pedidos (Cliente)",
+      "item": [
+        {
+          "name": "Checkout (finalizar compra)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"addressId\": 1,\n  \"paymentMethod\": \"PIX\",\n  \"deliveryMethod\": \"DELIVERY\",\n  \"notes\": \"Deixar na portaria\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "checkout"]
+            },
+            "description": "paymentMethod: CREDIT_CARD | DEBIT_CARD | PIX | CASH | BOLETO\ndeliveryMethod: DELIVERY | PICKUP"
+          }
+        },
+        {
+          "name": "Listar meus pedidos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalhes do pedido",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "1"]
+            }
+          }
+        },
+        {
+          "name": "Cancelar pedido",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/1/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "1", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Admin — Pedidos",
+      "item": [
+        {
+          "name": "Listar todos os pedidos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "orders"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "status", "value": "CREATED", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar pedido por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "orders", "1"]
+            }
+          }
+        },
+        {
+          "name": "Confirmar pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Pagamento confirmado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "orders", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar status para PREPARING",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PREPARING\",\n  \"notes\": \"Separando itens\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "orders", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Marcar como entregue",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DELIVERED\",\n  \"notes\": \"Entregue ao destinatário\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "orders", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Cancelar pedido (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\",\n  \"notes\": \"Produto indisponível no estoque\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "orders", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Preços",
+      "item": [
+        {
+          "name": "Definir / atualizar preço",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"storeId\": 1,\n  \"price\": 12.90,\n  \"promotionalPrice\": null,\n  \"promotionStartAt\": null,\n  \"promotionEndAt\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/prices",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "prices"]
+            },
+            "description": "Cria ou atualiza o preço de um produto em uma loja. Se já existir registro para o par produto+loja, atualiza."
+          }
+        },
+        {
+          "name": "Definir preço com promoção",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"storeId\": 1,\n  \"price\": 12.90,\n  \"promotionalPrice\": 9.90,\n  \"promotionStartAt\": \"2026-03-16T00:00:00Z\",\n  \"promotionEndAt\": \"2026-03-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/prices",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "prices"]
+            }
+          }
+        },
+        {
+          "name": "Listar preços por produto",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/prices/product/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "prices", "product", "1"]
+            }
+          }
+        },
+        {
+          "name": "Buscar preço por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/prices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "prices", "1"]
+            }
+          }
+        },
+        {
+          "name": "Remover promoção",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/prices/1/promotion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "prices", "1", "promotion"]
+            }
+          }
+        },
+        {
+          "name": "Desativar preço",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/prices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "prices", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Estoque",
+      "item": [
+        {
+          "name": "Definir / atualizar estoque",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"storeId\": 1,\n  \"availableQuantity\": 100,\n  \"minimumQuantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "inventory"]
+            },
+            "description": "Cria ou atualiza o estoque de um produto em uma loja."
+          }
+        },
+        {
+          "name": "Listar estoque por produto",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/product/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "inventory", "product", "1"]
+            }
+          }
+        },
+        {
+          "name": "Buscar estoque por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "inventory", "1"]
+            }
+          }
+        },
+        {
+          "name": "Ajustar estoque (entrada)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 50,\n  \"reason\": \"Recebimento de mercadoria NF-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/1/adjust",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "inventory", "1", "adjust"]
+            }
+          }
+        },
+        {
+          "name": "Ajustar estoque (saída / perda)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": -10,\n  \"reason\": \"Ajuste de inventário — produto vencido\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/1/adjust",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "inventory", "1", "adjust"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

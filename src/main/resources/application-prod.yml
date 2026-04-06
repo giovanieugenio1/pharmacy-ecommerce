@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      timeout: 2000ms
+
+logging:
+  level:
+    root: WARN
+    com.pharmacy.commerce: INFO
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+  admin:
+    email: ${ADMIN_EMAIL:admin@farmacia.com}
+    password: ${ADMIN_PASSWORD}
